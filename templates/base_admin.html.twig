@@ -45,15 +45,19 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
+                        {# On capture l'ID de l'evenement AVANT de boucler sur les autres flashs #}
+                        {% set ask_prog_id = null %}
+                        {% for message in app.flashes('ask_add_prog') %}
+                            {% set ask_prog_id = message %}
+                        {% endfor %}
+
                         {% for label, messages in app.flashes %}
-                            {% if label != 'ask_add_prog' %}
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'notice' ? 'info' : label) }} alert-dismissible fade show mt-3 shadow-sm" role="alert">
-                                        <i class="fas fa-info-circle me-1"></i> {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'notice' ? 'info' : label) }} alert-dismissible fade show mt-3 shadow-sm" role="alert">
+                                    <i class="fas fa-info-circle me-1"></i> {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
                         {% endfor %}
 
                         {% block body %}{% endblock %}
@@ -81,28 +85,29 @@
         </script>
         
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        {% set ask_prog_flash = app.flashes('ask_add_prog') %}
-        {% if ask_prog_flash is not empty %}
+        {% if ask_prog_id is not null %}
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     Swal.fire({
                         title: 'Événement ajouté avec succès !',
-                        text: "Voulez-vous lui associer un Programme dès maintenant ?",
-                        icon: 'success',
-                        background: '#212529',
-                        color: '#fff',
+                        text: "Souhaitez-vous ajouter un programme pour cet événement maintenant ?",
+                        icon: 'question',
                         showCancelButton: true,
                         confirmButtonColor: '#ff3c36',
                         cancelButtonColor: '#6c757d',
                         confirmButtonText: 'Oui, ajouter un programme',
-                        cancelButtonText: 'Non, plus tard'
+                        cancelButtonText: 'Plus tard',
+                        background: '#212529',
+                        color: '#fff'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = "{{ path('app_programme_new', {'event_id': ask_prog_flash[0]}) }}";
+                            window.location.href = "{{ path('app_programme_new') }}?event_id={{ ask_prog_id }}";
                         }
                     });
                 });
             </script>
         {% endif %}
+
+
     </body>
 </html>

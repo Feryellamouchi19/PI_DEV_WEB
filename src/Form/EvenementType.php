@@ -8,6 +8,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -62,11 +64,18 @@ class EvenementType extends AbstractType
             ])
 
             ->add('image', TextType::class, [
-                'label' => "Nom de l'image",
+                'label' => "Image (URL ou IA)",
                 'required' => false,
                 'attr' => [
-                    'placeholder' => 'Ex: evenement.jpg',
+                    'placeholder' => "Ex: evenement.jpg ou base64 générée",
                 ],
+            ])
+            ->add('imageFile', \Vich\UploaderBundle\Form\Type\VichImageType::class, [
+                'label' => 'Upload Image (depuis votre ordinateur)',
+                'required' => false,
+                'allow_delete' => true,
+                'download_uri' => true,
+                'image_uri' => true,
             ])
 
             ->add('spotify_url', UrlType::class, [
@@ -85,7 +94,16 @@ class EvenementType extends AbstractType
                     'placeholder' => 'Ex: tente, sac de couchage, dress code...',
                     'id' => 'equipments-input',
                 ],
+            ])
+            
+            ->add('propose_makeup', CheckboxType::class, [
+                'label' => 'Proposer un Coin Makeup ?',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-check-input'
+                ]
             ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

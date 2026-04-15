@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 use App\Entity\Evenement;
 
@@ -15,18 +17,25 @@ class Programme
     #[ORM\Column(type: "integer")]
     private ?int $id_prog = null;
 
-        #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "programmes")]
+    #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "programmes")]
     #[ORM\JoinColumn(name: 'event_id', referencedColumnName: 'id_event', onDelete: 'CASCADE')]
+    #[Assert\NotNull(message: "Le programme doit être rattaché à un événement.")]
     private ?Evenement $event_id = null;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "Le titre du programme est obligatoire.")]
+    #[Assert\Length(min: 3, minMessage: "Le titre doit comporter au moins {{ limit }} caractères.")]
     private ?string $titre = null;
 
     #[ORM\Column(type: "datetime")]
+    #[Assert\NotBlank(message: "La date de début est obligatoire.")]
     private ?\DateTimeInterface $date_debut = null;
 
     #[ORM\Column(type: "datetime")]
+    #[Assert\NotBlank(message: "La date de fin est obligatoire.")]
+    #[Assert\GreaterThanOrEqual(propertyPath: "date_debut", message: "La date de fin doit être ultérieure ou égale à la date de début.")]
     private ?\DateTimeInterface $date_fin = null;
+
 
     public function getId_prog()
     {
